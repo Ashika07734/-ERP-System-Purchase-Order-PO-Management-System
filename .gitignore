@@ -22,7 +22,7 @@ node_modules/
 # Logs and databases
 *.log
 *.sqlite3
-erp.db
+*.db
 
 # Docker
 .dockerignore
