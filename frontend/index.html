@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ERP Cloud — Purchase Orders Overview">
+    <title>Purchase Orders — ERP Cloud</title>
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="animated-bg"></div>
+
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <div id="sidebar-container"></div>
+
+        <!-- Main -->
+        <div class="main-content">
+            <!-- Navbar -->
+            <div id="navbar-container"></div>
+
+            <!-- Page Content -->
+            <div class="page-content">
+
+                <!-- Page Header -->
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <h1 style="font-size:24px; font-weight:800;">Purchase Orders</h1>
+                        <p class="text-muted text-sm">Manage and track all purchase orders</p>
+                    </div>
+                    <a href="/static/create_po.html" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> New Order
+                    </a>
+                </div>
+
+                <!-- Table -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3><i class="fas fa-list" style="margin-right:8px; color:var(--primary)"></i>All Orders</h3>
+                        <div class="table-actions">
+                            <div class="search-wrapper">
+                                <i class="fas fa-search"></i>
+                                <input type="text" class="search-input" placeholder="Search by reference..."
+                                       id="searchInput" oninput="debounceSearch()">
+                            </div>
+                            <select class="filter-select" id="statusFilter" onchange="applyFilters()">
+                                <option value="">All Statuses</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Approved">Approved</option>
+                                <option value="Rejected">Rejected</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th onclick="sortPOs('reference_no')">Reference <i class="fas fa-sort" style="font-size:10px"></i></th>
+                                <th>Vendor</th>
+                                <th onclick="sortPOs('total_amount')">Amount <i class="fas fa-sort" style="font-size:10px"></i></th>
+                                <th>Status</th>
+                                <th onclick="sortPOs('created_at')">Date <i class="fas fa-sort" style="font-size:10px"></i></th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="poTableBody">
+                            <tr>
+                                <td colspan="6" class="text-center text-muted" style="padding:40px">
+                                    <div class="spinner spinner-inline"></div> Loading...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Pagination -->
+                    <div class="pagination" id="paginationContainer">
+                        <button class="page-btn" onclick="loadPurchaseOrders(currentPage - 1)" id="prevBtn">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <span class="text-sm text-muted" id="pageInfo">Page 1</span>
+                        <button class="page-btn" onclick="loadPurchaseOrders(currentPage + 1)" id="nextBtn">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+    <script src="/static/js/po.js"></script>
+    <script>
+        let searchTimeout;
+        function debounceSearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(applyFilters, 400);
+        }
+
+        function applyFilters() {
+            const status = document.getElementById('statusFilter')?.value || '';
+            const search = document.getElementById('searchInput')?.value || '';
+            loadPurchaseOrders(0, status, search);
+        }
+
+        function sortPOs(field) {
+            // Client-side sort indication (server sorting handled by future enhancement)
+            showToast('Sorting by ' + field, 'info');
+            applyFilters();
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!requireAuth()) return;
+            await initApp('Purchase Orders');
+            loadPurchaseOrders();
+        });
+    </script>
+</body>
+</html>
