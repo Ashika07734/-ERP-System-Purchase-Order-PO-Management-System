@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ERP Cloud — Products Management">
+    <title>Products — ERP Cloud</title>
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="animated-bg"></div>
+
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <div id="sidebar-container"></div>
+
+        <!-- Main -->
+        <div class="main-content">
+            <!-- Navbar -->
+            <div id="navbar-container"></div>
+
+            <!-- Page Content -->
+            <div class="page-content">
+
+                <!-- Page Header -->
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <h1 style="font-size:24px; font-weight:800;">Products Database</h1>
+                        <p class="text-muted text-sm">Manage inventory and AI-generate product details</p>
+                    </div>
+                </div>
+
+                <!-- Add Product Section -->
+                <div class="glass-card mb-3 padding-4" style="background: linear-gradient(135deg, rgba(99,102,241,0.05), rgba(6,182,212,0.05));">
+                    <h3 style="font-size:16px; font-weight:700; margin-bottom:20px;">
+                        <i class="fas fa-magic" style="color:var(--primary); margin-right:8px;"></i>
+                        Add New Product (with AI Auto-Description)
+                    </h3>
+                    <form onsubmit="submitProduct(event)" id="productForm">
+                        <div class="form-row">
+                            <div class="form-group" style="flex:2">
+                                <label class="form-label">Product Name *</label>
+                                <input type="text" class="form-control" id="productName" required placeholder="e.g. Industrial Steel Beam">
+                            </div>
+                            <div class="form-group" style="flex:1">
+                                <label class="form-label">Category</label>
+                                <input type="text" class="form-control" id="productCategory" required placeholder="Hardware">
+                            </div>
+                            <div class="form-group" style="flex:1">
+                                <label class="form-label">Unit Price ($) *</label>
+                                <input type="number" class="form-control" id="productPrice" step="0.01" required value="0.00">
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 10px;">
+                            <label class="form-label">Description</label>
+                            <div style="display:flex; gap:10px;">
+                                <textarea class="form-control" id="productDescription" rows="3" placeholder="Click 'Auto-Generate' to let AI write a professional description..." style="flex:1;"></textarea>
+                                <button type="button" class="btn btn-primary" onclick="generateDescription()" id="aiBtn" style="height: fit-content;">
+                                    <i class="fas fa-sparkles"></i> Auto-Generate
+                                </button>
+                            </div>
+                        </div>
+
+                        <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+                            <button type="submit" class="btn btn-success">Save Product</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Table -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3><i class="fas fa-boxes-stacked" style="margin-right:8px; color:var(--primary)"></i>Product Catalog</h3>
+                        <button class="btn btn-sm btn-secondary" onclick="loadProductTable()">Refresh</button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>SKU</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productTableBody">
+                            <tr>
+                                <td colspan="5" class="text-center text-muted" style="padding:40px">
+                                    <div class="spinner spinner-inline"></div> Loading...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+    <script src="/static/js/po.js"></script>
+    <script>
+        async function loadProductTable() {
+            try {
+                const products = await apiGet('/api/products');
+                const tbody = document.getElementById('productTableBody');
+                
+                if (products.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center">No products found</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = products.map(p => `
+                    <tr>
+                        <td><span class="font-mono text-sm">${p.sku}</span></td>
+                        <td style="font-weight:600">${p.name}</td>
+                        <td><span class="badge" style="background:rgba(99,102,241,0.1); color:var(--primary)">${p.category}</span></td>
+                        <td>${formatCurrency(p.unit_price)}</td>
+                        <td style="max-width:300px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${p.description || ''}">
+                            <span class="text-sm text-muted">${p.description ? p.description.substring(0, 50) + '...' : '—'}</span>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                showToast('Failed to load products', 'error');
+            }
+        }
+
+        async function generateDescription() {
+            const name = document.getElementById('productName').value;
+            const category = document.getElementById('productCategory').value;
+            const btn = document.getElementById('aiBtn');
+            const desc = document.getElementById('productDescription');
+
+            if (!name) {
+                showToast('Please enter a product name first', 'warning');
+                document.getElementById('productName').focus();
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Generating...';
+
+            try {
+                // Call the existing backend endpoint for AI description
+                const result = await apiPost('/api/products/ai-description', {
+                    product_name: name,
+                    category: category || 'General'
+                });
+                
+                if (result.description) {
+                    desc.value = result.description;
+                    showToast('AI description generated successfully!', 'success');
+                } else {
+                    showToast('AI generation returned empty', 'warning');
+                }
+            } catch (error) {
+                showToast('AI generation failed: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-sparkles"></i> Auto-Generate';
+            }
+        }
+
+        async function submitProduct(e) {
+            e.preventDefault();
+            const name = document.getElementById('productName').value;
+            const category = document.getElementById('productCategory').value;
+            const price = parseFloat(document.getElementById('productPrice').value);
+            const desc = document.getElementById('productDescription').value;
+
+            // Generate a random SKU like SKU-1234
+            const randSku = 'SKU-' + Math.floor(1000 + Math.random() * 9000);
+
+            try {
+                showSpinner();
+                await apiPost('/api/products', {
+                    name: name,
+                    sku: randSku,
+                    category: category,
+                    unit_price: price,
+                    description: desc
+                });
+                showToast('Product added successfully!', 'success');
+                document.getElementById('productForm').reset();
+                loadProductTable();
+            } catch (err) {
+                showToast('Failed to add product', 'error');
+            } finally {
+                hideSpinner();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!requireAuth()) return;
+            await initApp('Products');
+            await loadProductTable();
+        });
+    </script>
+</body>
+</html>
