@@ -1,0 +1,47 @@
+<!-- Sidebar Component -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <div class="logo-icon">
+            <i class="fas fa-cube"></i>
+        </div>
+        <span class="brand-text">ERP Cloud</span>
+    </div>
+
+    <nav class="sidebar-nav">
+        <div class="nav-section-title">Main</div>
+        <a href="/static/dashboard.html" class="nav-link" data-page="dashboard">
+            <i class="fas fa-th-large"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <div class="nav-section-title">Management</div>
+        <a href="/static/index.html" class="nav-link" data-page="purchase-orders">
+            <i class="fas fa-file-invoice-dollar"></i>
+            <span>Purchase Orders</span>
+        </a>
+        <a href="/static/create_po.html" class="nav-link" data-page="create-po">
+            <i class="fas fa-plus-circle"></i>
+            <span>Create PO</span>
+        </a>
+
+        <div class="nav-section-title">Data</div>
+        <a href="#" class="nav-link" data-page="vendors">
+            <i class="fas fa-building"></i>
+            <span>Vendors</span>
+        </a>
+        <a href="/static/products.html" class="nav-link" data-page="products">
+            <i class="fas fa-boxes-stacked"></i>
+            <span>Products</span>
+        </a>
+
+        <div class="nav-section-title">System</div>
+        <a href="#" class="nav-link" data-page="settings">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+        </a>
+        <a href="#" class="nav-link" onclick="logout()" data-page="logout">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </a>
+    </nav>
+</aside>
