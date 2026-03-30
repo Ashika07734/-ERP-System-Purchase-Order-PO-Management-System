@@ -95,7 +95,7 @@ The complete end-to-end working flow is structured as follows:
 _Below are visual demonstrations of the system functionalities:_
 
 * **Dashboard Screenshot**  
-  ![Dashboard](screenshots/dashboard.png)
+  ![Dashboard](screenshots/dashboard.webp)
 
 * **Create PO Screenshot**  
   ![Create PO](screenshots/create_po.png)
