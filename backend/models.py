@@ -4,7 +4,7 @@ ERP PO Management System — SQLAlchemy ORM Models
 
 from sqlalchemy import (
     Column, Integer, String, Numeric, Boolean, Text,
-    ForeignKey, DateTime, CheckConstraint
+    ForeignKey, DateTime, CheckConstraint, Date
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -34,6 +34,7 @@ class Vendor(Base):
     name       = Column(String(255), nullable=False)
     contact    = Column(String(255))
     email      = Column(String(255))
+    gst_number = Column(String(20))
     address    = Column(Text)
     rating     = Column(Numeric(2, 1), default=0.0)
     is_active  = Column(Boolean, default=True)
@@ -55,6 +56,12 @@ class Product(Base):
     name        = Column(String(255), nullable=False)
     sku         = Column(String(100), unique=True, nullable=False, index=True)
     category    = Column(String(100))
+    brand       = Column(String(100))
+    unit_type   = Column(String(50))
+    expiry_date = Column(Date)
+    batch_number = Column(String(50))
+    minimum_stock = Column(Integer, default=10)
+    gst_rate    = Column(Numeric(5, 2), default=5.00)
     description = Column(Text)
     unit_price  = Column(Numeric(12, 2), nullable=False)
     stock_level = Column(Integer, default=0)
@@ -65,6 +72,8 @@ class Product(Base):
     __table_args__ = (
         CheckConstraint("unit_price >= 0", name="chk_product_price"),
         CheckConstraint("stock_level >= 0", name="chk_product_stock"),
+        CheckConstraint("minimum_stock >= 0", name="chk_product_minimum_stock"),
+        CheckConstraint("gst_rate IN (5.00, 12.00, 18.00)", name="chk_product_gst_rate"),
     )
 
     # Relationships
@@ -81,6 +90,7 @@ class PurchaseOrder(Base):
     tax_amount   = Column(Numeric(14, 2), default=0.00)
     total_amount = Column(Numeric(14, 2), default=0.00)
     status       = Column(String(20), default="Pending")
+    stock_updated = Column(Boolean, default=False)
     notes        = Column(Text)
     created_by   = Column(Integer, ForeignKey("users.user_id"))
     created_at   = Column(DateTime(timezone=True), server_default=func.now())
@@ -88,7 +98,7 @@ class PurchaseOrder(Base):
 
     __table_args__ = (
         CheckConstraint(
-            "status IN ('Pending', 'Approved', 'Rejected', 'Completed', 'Cancelled')",
+            "status IN ('Pending', 'Approved', 'Rejected', 'Completed', 'Cancelled', 'Received')",
             name="chk_po_status"
         ),
     )
@@ -107,12 +117,16 @@ class PurchaseOrderItem(Base):
     product_id = Column(Integer, ForeignKey("products.product_id", ondelete="RESTRICT"), nullable=False)
     quantity   = Column(Integer, nullable=False)
     unit_price = Column(Numeric(12, 2), nullable=False)
+    gst_rate   = Column(Numeric(5, 2), default=5.00)
+    tax_amount = Column(Numeric(14, 2), default=0.00)
     line_total = Column(Numeric(14, 2), default=0.00)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     __table_args__ = (
         CheckConstraint("quantity > 0", name="chk_item_qty"),
         CheckConstraint("unit_price >= 0", name="chk_item_price"),
+        CheckConstraint("gst_rate IN (5.00, 12.00, 18.00)", name="chk_item_gst_rate"),
+        CheckConstraint("tax_amount >= 0", name="chk_item_tax_amount"),
     )
 
     # Relationships

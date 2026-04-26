@@ -124,6 +124,43 @@
                             <i class="fas fa-boxes-stacked"></i>
                         </div>
                     </div>
+
+                    <div class="stat-card red">
+                        <div class="stat-info">
+                            <h4>Low Stock Alerts</h4>
+                            <div class="stat-value" id="lowStockCount">—</div>
+                            <div class="stat-sub">Below minimum threshold</div>
+                        </div>
+                        <div class="stat-icon red">
+                            <i class="fas fa-triangle-exclamation"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container" style="margin-bottom: 28px; border: 1px solid rgba(239, 68, 68, 0.25);">
+                    <div class="table-header">
+                        <h3 style="color: var(--danger);">
+                            <i class="fas fa-bell" style="margin-right:8px;"></i>Low Stock Alerts
+                        </h3>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th>Brand</th>
+                                <th>Current Stock</th>
+                                <th>Minimum Stock</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lowStockBody">
+                            <tr>
+                                <td colspan="5" class="text-center text-muted" style="padding:20px">
+                                    Loading low stock alerts...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
                 <!-- Recent Orders Table -->

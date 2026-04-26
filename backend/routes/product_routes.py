@@ -5,6 +5,7 @@ ERP PO Management System — Product API Routes
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import Optional, List
+from datetime import date
 
 from backend.database import get_db
 from backend.auth import get_current_user
@@ -25,12 +26,22 @@ def list_products(
     limit: int = Query(100, ge=1, le=500),
     search: Optional[str] = None,
     category: Optional[str] = None,
+    brand: Optional[str] = None,
+    expiry_before: Optional[date] = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """Retrieve all active products with optional filters."""
     try:
-        return crud.get_products(db, skip=skip, limit=limit, search=search, category=category)
+        return crud.get_products(
+            db,
+            skip=skip,
+            limit=limit,
+            search=search,
+            category=category,
+            brand=brand,
+            expiry_before=expiry_before,
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

@@ -9,30 +9,30 @@ INSERT INTO users (email, full_name, picture, provider) VALUES
 ('jane.smith@example.com', 'Jane Smith', NULL, 'google');
 
 -- Sample Vendors
-INSERT INTO vendors (name, contact, email, address, rating) VALUES
-('Acme Industrial Supplies',   '+1-555-0101', 'sales@acme-ind.com',     '100 Industrial Blvd, Chicago, IL 60601',       4.5),
-('GlobalTech Components',      '+1-555-0202', 'orders@globaltech.com',  '250 Innovation Dr, San Jose, CA 95110',        4.8),
-('PrimeParts Manufacturing',   '+1-555-0303', 'info@primeparts.com',    '78 Factory Lane, Detroit, MI 48201',           4.2),
-('Vertex Raw Materials',       '+1-555-0404', 'supply@vertex-rm.com',   '500 Commerce St, Houston, TX 77001',           3.9),
-('NexGen Office Solutions',    '+1-555-0505', 'sales@nexgenoffice.com', '12 Business Park Ave, New York, NY 10001',     4.6),
-('Pacific Trade Logistics',    '+1-555-0606', 'ptl@pacifictrade.com',   '300 Harbor Way, Long Beach, CA 90802',         4.1),
-('EuroParts International',    '+44-20-7946',  'eu@europarts.co.uk',    '45 King Road, London, UK EC2A 1AF',            4.7),
-('SilverLine Packaging',       '+1-555-0808', 'orders@silverline.com',  '88 Pack St, Memphis, TN 38103',                3.8);
+INSERT INTO vendors (name, contact, email, gst_number, address, rating) VALUES
+('FreshMart Distributors',      '+1-555-1101', 'sales@freshmartdist.com',  '27AAACF1234B1ZK', '100 Market Yard, Chicago, IL 60601',   4.6),
+('GoldenGrain Wholesale',       '+1-555-1102', 'orders@goldengrain.com',   '27AAAGG5678K1Z3', '250 Food Hub Ave, San Jose, CA 95110',  4.7),
+('DailyDairy Supply Co.',       '+1-555-1103', 'info@dailydairy.com',      '27AAADD9012P1ZX', '78 Cold Chain Road, Detroit, MI 48201',  4.4),
+('SpiceRoute Traders',          '+1-555-1104', 'supply@spiceroute.com',    '27AAASR4567Q1Z8', '500 Wholesale Street, Houston, TX 77001', 4.3),
+('QuickSnack FMCG',             '+1-555-1105', 'sales@quicksnackfmcg.com', '27AAAQS8934R1Z2', '12 Distribution Park, New York, NY 10001', 4.5),
+('PureDrop Beverages',          '+1-555-1106', 'ptl@puredropbev.com',      '27AAAPD7788M1ZT', '300 Harbor Commerce, Long Beach, CA 90802', 4.2),
+('CleanNest Essentials',        '+1-555-1107', 'eu@cleannest.co.uk',       '27AAACN3344N1ZL', '45 Retail Avenue, London, UK EC2A 1AF', 4.1),
+('FrozenCart Foods',            '+1-555-1108', 'orders@frozencart.com',    '27AAAFC8899T1ZA', '88 Warehouse Lane, Memphis, TN 38103', 4.0);
 
 -- Sample Products
-INSERT INTO products (name, sku, category, description, unit_price, stock_level) VALUES
-('Stainless Steel Bolt M10',       'SSB-M10-001',   'Hardware',      'High-grade stainless steel hex bolt, M10x50mm',           2.50,   5000),
-('Industrial Bearing 6205',        'BRG-6205-002',  'Bearings',      'Deep groove ball bearing, 25x52x15mm',                    12.75,  1200),
-('Hydraulic Hose 1/2" x 3m',       'HYD-H12-003',  'Hydraulics',    'Reinforced hydraulic hose, 1/2 inch, 3 meter length',     34.00,   800),
-('LED Panel Light 60W',            'LED-PNL-004',   'Electrical',    '600x600mm recessed LED panel, 6500K daylight',            45.99,   350),
-('Copper Wire 2.5mm² (100m)',      'COP-W25-005',   'Electrical',    'Single core copper cable, 100 meter roll',                78.50,   200),
-('Safety Helmet – Class E',        'SAF-HLM-006',   'Safety',        'ANSI Z89.1 certified hard hat, adjustable ratchet',       18.25,  1500),
-('Welding Rod E7018 (5kg)',        'WLD-718-007',   'Welding',       'Low hydrogen electrode, 3.2mm, 5kg pack',                 22.00,   900),
-('Pneumatic Cylinder 50x200',      'PNU-C50-008',   'Pneumatics',    'Double-acting pneumatic cylinder, 50mm bore, 200mm stroke', 89.00,  150),
-('Industrial Lubricant 5L',        'LUB-IND-009',   'Chemicals',     'Multi-purpose industrial lubricant, 5 liter can',         32.50,   400),
-('Thermal Printer Paper (50 rolls)','TPP-50R-010',  'Office',        'BPA-free thermal receipt paper, 80x80mm, box of 50',      28.00,   600),
-('Carbon Steel Pipe DN50',        'CSP-DN50-011',  'Piping',        'Schedule 40 carbon steel pipe, 2 inch, 6m length',        125.00,   100),
-('Nitrile Gloves Box (Large)',     'GLV-NIT-012',   'Safety',        'Powder-free nitrile gloves, large, box of 100',            9.99,  3000);
+INSERT INTO products (name, sku, category, brand, unit_type, expiry_date, batch_number, minimum_stock, gst_rate, description, unit_price, stock_level) VALUES
+('Basmati Rice 25kg',               'RICE-BSM-001',  'Rice',              'Royal Harvest',  'Bag',    '2027-03-31', 'BR-2503-A1',  50,  5.00,  'Premium long-grain basmati rice for wholesale supply.',                42.50,  220),
+('Whole Wheat Flour 10kg',          'FLR-WHT-002',   'Flour',             'Aashirvaad',     'Bag',    '2026-12-15', 'WF-2612-B2',  40,  5.00,  'Stone-milled atta flour suitable for retail repackaging.',             19.75,  180),
+('Refined Sunflower Oil 1L',        'OIL-SFL-003',   'Oil',               'Fortune',        'Bottle', '2027-01-20', 'SO-2701-C3', 120,  5.00,  'Refined sunflower oil in 1 liter bottles.',                             2.10,  520),
+('Potato Chips Classic 52g',        'SNK-CHP-004',   'Snacks',            'Layz',           'Packet', '2026-09-10', 'PC-2609-D1', 200, 12.00,  'Classic salted potato chips, FMCG fast-moving snack item.',             0.55,  900),
+('Mango Juice 1L',                  'BEV-MNG-005',   'Beverages',         'Tropico',        'Bottle', '2026-11-25', 'MJ-2611-E4', 150, 12.00,  'Ready-to-serve mango juice with fruit pulp.',                           1.45,  420),
+('UHT Milk 1L',                     'DRY-MLK-006',   'Dairy',             'AmulFresh',      'Packet', '2026-08-01', 'ML-2608-F2', 180,  5.00,  'Long shelf-life UHT milk for supermarket channels.',                    1.20,  300),
+('Turmeric Powder 500g',            'SPC-TRM-007',   'Spices',            'EverSpice',      'Packet', '2027-06-30', 'TP-2706-G5', 100,  5.00,  'Ground turmeric powder in moisture-proof laminated packs.',             1.10,  260),
+('Frozen Green Peas 500g',          'FRZ-PEA-008',   'Frozen Foods',      'IceField',       'Packet', '2026-10-05', 'FG-2610-H3', 140,  5.00,  'IQF frozen peas for horeca and retail distribution.',                   1.35,  110),
+('Dishwash Liquid 500ml',           'CLN-DWL-009',   'Cleaning Products', 'SparkleHome',    'Bottle', '2027-02-14', 'DL-2702-J9',  90, 18.00,  'Lemon dishwashing liquid for kitchen cleaning.',                        1.90,   85),
+('Gram Flour 1kg',                  'FLR-GRM-010',   'Flour',             'GoodGrain',      'Packet', '2027-01-31', 'GF-2701-K7', 110,  5.00,  'Fine gram flour suitable for snacks and household use.',                1.05,  240),
+('Chocolate Wafer Box (24 pcs)',    'SNK-WFR-011',   'Snacks',            'CrunchBite',     'Box',    '2026-12-28', 'CW-2612-L4',  80, 12.00,  'Assorted chocolate wafer bars in trade pack.',                          6.80,   75),
+('Detergent Powder 1kg',            'CLN-DTR-012',   'Cleaning Products', 'BrightWash',     'Packet', '2027-04-12', 'DP-2704-M6', 130, 18.00,  'High-foam detergent powder for household laundry.',                     2.35,   65);
 
 -- Sample Purchase Orders
 INSERT INTO purchase_orders (reference_no, vendor_id, subtotal, tax_amount, total_amount, status, notes, created_by) VALUES

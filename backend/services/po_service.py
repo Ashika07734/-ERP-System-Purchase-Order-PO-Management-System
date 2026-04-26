@@ -9,30 +9,31 @@ from sqlalchemy.orm import Session
 from backend import crud
 from backend.utils import generate_reference_no
 
-# Tax rate constant
-TAX_RATE = Decimal("0.05")  # 5%
-
-
 def calculate_total(items: list) -> dict:
     """
-    Calculate subtotal, tax, and total for a list of PO items.
+    Calculate subtotal, tax, and total for a list of PO items with per-item GST.
 
     Args:
-        items: list of dicts with 'quantity' and 'unit_price' keys.
+        items: list of dicts with 'quantity', 'unit_price', and optional 'gst_rate' keys.
 
     Returns:
         dict with 'subtotal', 'tax_amount', 'total_amount'.
 
     Business rule:
-        total = subtotal + (subtotal * 0.05)
+        tax per line = line_total * gst_rate / 100
+        total = subtotal + sum(line taxes)
     """
     subtotal = Decimal("0.00")
+    tax_amount = Decimal("0.00")
     for item in items:
         qty = Decimal(str(item["quantity"]))
         price = Decimal(str(item["unit_price"]))
-        subtotal += (qty * price).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        gst_rate = Decimal(str(item.get("gst_rate", "5.00")))
+        line_total = (qty * price).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        line_tax = (line_total * (gst_rate / Decimal("100"))).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        subtotal += line_total
+        tax_amount += line_tax
 
-    tax_amount = (subtotal * TAX_RATE).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
     total_amount = subtotal + tax_amount
 
     return {
@@ -61,10 +62,16 @@ def create_purchase_order(db: Session, vendor_id: int, items: list, notes: str =
         product = crud.get_product(db, item["product_id"])
         if not product:
             raise ValueError(f"Product with ID {item['product_id']} not found")
+
+        gst_rate = item.get("gst_rate")
+        if gst_rate is None:
+            gst_rate = str(product.gst_rate or "5.00")
+
         items_data.append({
             "product_id": item["product_id"],
             "quantity": item["quantity"],
             "unit_price": item["unit_price"],
+            "gst_rate": gst_rate,
         })
 
     # 3. Calculate totals

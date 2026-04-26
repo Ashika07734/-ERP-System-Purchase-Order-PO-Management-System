@@ -47,15 +47,70 @@
                         <div class="form-row">
                             <div class="form-group" style="flex:2">
                                 <label class="form-label">Product Name *</label>
-                                <input type="text" class="form-control" id="productName" required placeholder="e.g. Industrial Steel Beam">
+                                <input type="text" class="form-control" id="productName" required placeholder="e.g. Basmati Rice 25kg">
                             </div>
                             <div class="form-group" style="flex:1">
                                 <label class="form-label">Category</label>
-                                <input type="text" class="form-control" id="productCategory" required placeholder="Hardware">
+                                <select class="form-control" id="productCategory" required>
+                                    <option value="">— Select Category —</option>
+                                    <option>Rice</option>
+                                    <option>Flour</option>
+                                    <option>Oil</option>
+                                    <option>Snacks</option>
+                                    <option>Beverages</option>
+                                    <option>Dairy</option>
+                                    <option>Spices</option>
+                                    <option>Frozen Foods</option>
+                                    <option>Cleaning Products</option>
+                                </select>
                             </div>
                             <div class="form-group" style="flex:1">
                                 <label class="form-label">Unit Price ($) *</label>
                                 <input type="number" class="form-control" id="productPrice" step="0.01" required value="0.00">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Brand Name</label>
+                                <input type="text" class="form-control" id="productBrand" placeholder="e.g. Aashirvaad">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Unit Type</label>
+                                <select class="form-control" id="productUnitType">
+                                    <option value="">— Select Unit —</option>
+                                    <option>Kg</option>
+                                    <option>Gram</option>
+                                    <option>Liter</option>
+                                    <option>Packet</option>
+                                    <option>Box</option>
+                                    <option>Carton</option>
+                                    <option>Bottle</option>
+                                    <option>Bag</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Expiry Date</label>
+                                <input type="date" class="form-control" id="productExpiryDate">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Batch Number</label>
+                                <input type="text" class="form-control" id="productBatchNumber" placeholder="e.g. RICE-APR26-B12">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Minimum Stock Level</label>
+                                <input type="number" class="form-control" id="productMinimumStock" min="0" value="10">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">GST Rate</label>
+                                <select class="form-control" id="productGstRate">
+                                    <option value="5">5%</option>
+                                    <option value="12">12%</option>
+                                    <option value="18">18%</option>
+                                </select>
                             </div>
                         </div>
 
@@ -81,19 +136,52 @@
                         <h3><i class="fas fa-boxes-stacked" style="margin-right:8px; color:var(--primary)"></i>Product Catalog</h3>
                         <button class="btn btn-sm btn-secondary" onclick="loadProductTable()">Refresh</button>
                     </div>
+                    <div class="form-row" style="padding: 0 20px 20px;">
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label">Search</label>
+                            <input type="text" id="productSearch" class="form-control" placeholder="Search by product name or SKU" oninput="loadProductTable()">
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label">Filter by Category</label>
+                            <select id="filterCategory" class="form-control" onchange="loadProductTable()">
+                                <option value="">All Categories</option>
+                                <option>Rice</option>
+                                <option>Flour</option>
+                                <option>Oil</option>
+                                <option>Snacks</option>
+                                <option>Beverages</option>
+                                <option>Dairy</option>
+                                <option>Spices</option>
+                                <option>Frozen Foods</option>
+                                <option>Cleaning Products</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label">Filter by Brand</label>
+                            <input type="text" id="filterBrand" class="form-control" placeholder="e.g. Fortune" oninput="loadProductTable()">
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label">Expiry Before</label>
+                            <input type="date" id="filterExpiry" class="form-control" onchange="loadProductTable()">
+                        </div>
+                    </div>
                     <table>
                         <thead>
                             <tr>
                                 <th>SKU</th>
                                 <th>Name</th>
                                 <th>Category</th>
+                                <th>Brand</th>
+                                <th>Unit</th>
+                                <th>Expiry</th>
+                                <th>Batch</th>
                                 <th>Price</th>
-                                <th>Description</th>
+                                <th>Stock</th>
                             </tr>
                         </thead>
                         <tbody id="productTableBody">
                             <tr>
-                                <td colspan="5" class="text-center text-muted" style="padding:40px">
+                                <td colspan="9" class="text-center text-muted" style="padding:40px">
                                     <div class="spinner spinner-inline"></div> Loading...
                                 </td>
                             </tr>
@@ -109,29 +197,7 @@
     <script src="/static/js/po.js"></script>
     <script>
         async function loadProductTable() {
-            try {
-                const products = await apiGet('/api/products');
-                const tbody = document.getElementById('productTableBody');
-                
-                if (products.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="text-center">No products found</td></tr>';
-                    return;
-                }
-
-                tbody.innerHTML = products.map(p => `
-                    <tr>
-                        <td><span class="font-mono text-sm">${p.sku}</span></td>
-                        <td style="font-weight:600">${p.name}</td>
-                        <td><span class="badge" style="background:rgba(99,102,241,0.1); color:var(--primary)">${p.category}</span></td>
-                        <td>${formatCurrency(p.unit_price)}</td>
-                        <td style="max-width:300px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${p.description || ''}">
-                            <span class="text-sm text-muted">${p.description ? p.description.substring(0, 50) + '...' : '—'}</span>
-                        </td>
-                    </tr>
-                `).join('');
-            } catch (e) {
-                showToast('Failed to load products', 'error');
-            }
+            await loadProductCatalogWithFilters();
         }
 
         async function generateDescription() {
@@ -175,6 +241,12 @@
             const name = document.getElementById('productName').value;
             const category = document.getElementById('productCategory').value;
             const price = parseFloat(document.getElementById('productPrice').value);
+            const brand = document.getElementById('productBrand').value;
+            const unitType = document.getElementById('productUnitType').value;
+            const expiryDate = document.getElementById('productExpiryDate').value;
+            const batchNumber = document.getElementById('productBatchNumber').value;
+            const minimumStock = parseInt(document.getElementById('productMinimumStock').value) || 10;
+            const gstRate = parseFloat(document.getElementById('productGstRate').value) || 5;
             const desc = document.getElementById('productDescription').value;
 
             // Generate a random SKU like SKU-1234
@@ -186,6 +258,12 @@
                     name: name,
                     sku: randSku,
                     category: category,
+                    brand: brand,
+                    unit_type: unitType,
+                    expiry_date: expiryDate || null,
+                    batch_number: batchNumber,
+                    minimum_stock: minimumStock,
+                    gst_rate: gstRate,
                     unit_price: price,
                     description: desc
                 });

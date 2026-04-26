@@ -5,6 +5,7 @@ ERP PO Management System — Purchase Order API Routes
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import Optional, List
+from fastapi.responses import StreamingResponse
 
 from backend.database import get_db
 from backend.auth import get_current_user
@@ -15,6 +16,7 @@ from backend.schemas import (
 )
 from backend import crud
 from backend.services.po_service import create_purchase_order
+from backend.services.pdf_service import generate_purchase_order_pdf
 
 router = APIRouter(prefix="/api/purchase-orders", tags=["Purchase Orders"])
 
@@ -101,6 +103,31 @@ def update_po_status(
         if not po:
             raise HTTPException(status_code=404, detail="Purchase order not found")
         return po
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/{po_id}/print")
+def print_purchase_order_pdf(
+    po_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Generate and stream a printable PDF document for a purchase order."""
+    try:
+        po = crud.get_purchase_order(db, po_id)
+        if not po:
+            raise HTTPException(status_code=404, detail="Purchase order not found")
+
+        pdf_stream = generate_purchase_order_pdf(po)
+        filename = f"{po.reference_no}.pdf"
+        return StreamingResponse(
+            pdf_stream,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        )
     except HTTPException:
         raise
     except Exception as e:

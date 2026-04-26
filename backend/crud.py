@@ -6,6 +6,7 @@ Database access layer for all entities.
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func, desc
 from typing import Optional, List
+from decimal import Decimal, ROUND_HALF_UP
 
 from backend.models import Vendor, Product, PurchaseOrder, PurchaseOrderItem
 
@@ -63,8 +64,16 @@ def delete_vendor(db: Session, vendor_id: int) -> bool:
 # PRODUCT CRUD
 # ══════════════════════════════════════════════════════════
 
-def get_products(db: Session, skip: int = 0, limit: int = 100, search: Optional[str] = None, category: Optional[str] = None) -> List[Product]:
-    """Retrieve products with optional search and category filter."""
+def get_products(
+    db: Session,
+    skip: int = 0,
+    limit: int = 100,
+    search: Optional[str] = None,
+    category: Optional[str] = None,
+    brand: Optional[str] = None,
+    expiry_before: Optional[str] = None,
+) -> List[Product]:
+    """Retrieve products with optional search and grocery-specific filters."""
     query = db.query(Product).filter(Product.is_active == True)
     if search:
         query = query.filter(
@@ -72,6 +81,11 @@ def get_products(db: Session, skip: int = 0, limit: int = 100, search: Optional[
         )
     if category:
         query = query.filter(Product.category == category)
+    if brand:
+        query = query.filter(Product.brand == brand)
+    if expiry_before:
+        query = query.filter(Product.expiry_date <= expiry_before)
+
     return query.order_by(Product.name).offset(skip).limit(limit).all()
 
 
@@ -152,13 +166,35 @@ def create_purchase_order(db: Session, po_data: dict, items_data: list) -> Purch
     db.flush()  # Get po_id
 
     for item in items_data:
-        line_total = item["quantity"] * float(item["unit_price"])
-        poi = PurchaseOrderItem(po_id=po.po_id, line_total=line_total, **item)
+        quantity = int(item["quantity"])
+        unit_price = Decimal(str(item["unit_price"]))
+        gst_rate = Decimal(str(item.get("gst_rate", "5.00")))
+        line_total = (Decimal(quantity) * unit_price).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        tax_amount = (line_total * (gst_rate / Decimal("100"))).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+        poi = PurchaseOrderItem(
+            po_id=po.po_id,
+            product_id=item["product_id"],
+            quantity=quantity,
+            unit_price=unit_price,
+            gst_rate=gst_rate,
+            tax_amount=tax_amount,
+            line_total=line_total,
+        )
         db.add(poi)
+
+        # On PO creation, stock is immediately updated per requested workflow.
+        product = get_product(db, item["product_id"])
+        if product:
+            product.stock_level = (product.stock_level or 0) + quantity
+
+    po.stock_updated = True
 
     db.commit()
     db.refresh(po)
-    return get_purchase_order(db, po.po_id)
+    po_full = get_purchase_order(db, po.po_id)
+    po_full.low_stock_alerts = get_low_stock_alerts(db)
+    return po_full
 
 
 def update_po_status(db: Session, po_id: int, new_status: str) -> Optional[PurchaseOrder]:
@@ -166,9 +202,21 @@ def update_po_status(db: Session, po_id: int, new_status: str) -> Optional[Purch
     po = db.query(PurchaseOrder).filter(PurchaseOrder.po_id == po_id).first()
     if not po:
         return None
+
+    # Backward-compatible safeguard for old records where stock was not updated at creation.
+    if new_status == "Received" and not po.stock_updated:
+        items = db.query(PurchaseOrderItem).filter(PurchaseOrderItem.po_id == po.po_id).all()
+        for item in items:
+            product = get_product(db, item.product_id)
+            if product:
+                product.stock_level = (product.stock_level or 0) + (item.quantity or 0)
+        po.stock_updated = True
+
     po.status = new_status
     db.commit()
-    return get_purchase_order(db, po_id)
+    po_full = get_purchase_order(db, po_id)
+    po_full.low_stock_alerts = get_low_stock_alerts(db)
+    return po_full
 
 
 def get_po_count(db: Session) -> int:
@@ -190,6 +238,13 @@ def get_dashboard_stats(db: Session) -> dict:
     total_value = db.query(func.coalesce(func.sum(PurchaseOrder.total_amount), 0)).scalar()
     vendors = db.query(func.count(Vendor.vendor_id)).filter(Vendor.is_active == True).scalar() or 0
     products = db.query(func.count(Product.product_id)).filter(Product.is_active == True).scalar() or 0
+    low_stock_products = (
+        db.query(Product)
+        .filter(Product.is_active == True, Product.stock_level < Product.minimum_stock)
+        .order_by(Product.stock_level.asc(), Product.name.asc())
+        .limit(20)
+        .all()
+    )
 
     return {
         "total_pos": total,
@@ -200,4 +255,26 @@ def get_dashboard_stats(db: Session) -> dict:
         "total_vendors": vendors,
         "total_products": products,
         "total_value": total_value,
+        "low_stock_products": low_stock_products,
     }
+
+
+def get_low_stock_products(db: Session, limit: int = 50) -> List[Product]:
+    """Get active products currently below minimum stock threshold."""
+    return (
+        db.query(Product)
+        .filter(Product.is_active == True, Product.stock_level < Product.minimum_stock)
+        .order_by(Product.stock_level.asc(), Product.name.asc())
+        .limit(limit)
+        .all()
+    )
+
+
+def get_low_stock_alerts(db: Session, limit: int = 10) -> List[str]:
+    """Generate human-readable low-stock warnings for API responses."""
+    alerts = []
+    for product in get_low_stock_products(db, limit=limit):
+        alerts.append(
+            f"Low Stock Alert: {product.name} (stock {product.stock_level}, minimum {product.minimum_stock})"
+        )
+    return alerts

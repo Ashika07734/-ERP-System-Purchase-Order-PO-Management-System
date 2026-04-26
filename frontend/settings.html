@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ERP Cloud — Settings">
+    <title>Settings — ERP Cloud</title>
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="animated-bg"></div>
+
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <div id="sidebar-container"></div>
+
+        <!-- Main -->
+        <div class="main-content">
+            <!-- Navbar -->
+            <div id="navbar-container"></div>
+
+            <!-- Page Content -->
+            <div class="page-content">
+
+                <!-- Page Header -->
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <h1 style="font-size:24px; font-weight:800;">Settings</h1>
+                        <p class="text-muted text-sm">Manage your account and preferences</p>
+                    </div>
+                </div>
+
+                <!-- Settings Grid -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 24px;">
+
+                    <!-- Theme Settings -->
+                    <div class="glass-card">
+                        <div style="padding: 24px; border-bottom: 1px solid var(--border-color);">
+                            <h3 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 700;">
+                                <i class="fas fa-palette" style="margin-right: 8px; color: var(--primary);"></i>
+                                Theme
+                            </h3>
+                            <p class="text-muted" style="margin: 0; font-size: 13px;">Customize your interface appearance</p>
+                        </div>
+                        <div style="padding: 24px;">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; margin-bottom: 0;">
+                                    <input type="checkbox" id="darkModeToggle" style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span>Dark Mode</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Account Info -->
+                    <div class="glass-card">
+                        <div style="padding: 24px; border-bottom: 1px solid var(--border-color);">
+                            <h3 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 700;">
+                                <i class="fas fa-user" style="margin-right: 8px; color: var(--primary);"></i>
+                                Account
+                            </h3>
+                            <p class="text-muted" style="margin: 0; font-size: 13px;">Your account information</p>
+                        </div>
+                        <div style="padding: 24px;">
+                            <div id="userInfo" style="display: grid; gap: 12px;">
+                                <div>
+                                    <p class="text-muted" style="margin: 0 0 4px 0; font-size: 12px;">Email</p>
+                                    <p id="userEmail" style="margin: 0; font-weight: 500;">—</p>
+                                </div>
+                                <div>
+                                    <p class="text-muted" style="margin: 0 0 4px 0; font-size: 12px;">Full Name</p>
+                                    <p id="userFullName" style="margin: 0; font-weight: 500;">—</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Session Info -->
+                    <div class="glass-card">
+                        <div style="padding: 24px; border-bottom: 1px solid var(--border-color);">
+                            <h3 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 700;">
+                                <i class="fas fa-shield-alt" style="margin-right: 8px; color: var(--primary);"></i>
+                                Session
+                            </h3>
+                            <p class="text-muted" style="margin: 0; font-size: 13px;">Active session information</p>
+                        </div>
+                        <div style="padding: 24px;">
+                            <div style="display: grid; gap: 12px;">
+                                <div>
+                                    <p class="text-muted" style="margin: 0 0 4px 0; font-size: 12px;">Auth Provider</p>
+                                    <p id="authProvider" style="margin: 0; font-weight: 500;">—</p>
+                                </div>
+                                <div style="margin-top: 12px;">
+                                    <button class="btn btn-secondary" onclick="logout()" style="width: 100%;">
+                                        <i class="fas fa-sign-out-alt" style="margin-right: 8px;"></i>
+                                        Sign Out
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- App Info -->
+                    <div class="glass-card">
+                        <div style="padding: 24px; border-bottom: 1px solid var(--border-color);">
+                            <h3 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 700;">
+                                <i class="fas fa-info-circle" style="margin-right: 8px; color: var(--primary);"></i>
+                                About
+                            </h3>
+                            <p class="text-muted" style="margin: 0; font-size: 13px;">Application information</p>
+                        </div>
+                        <div style="padding: 24px;">
+                            <div style="display: grid; gap: 12px;">
+                                <div>
+                                    <p class="text-muted" style="margin: 0 0 4px 0; font-size: 12px;">Application</p>
+                                    <p style="margin: 0; font-weight: 500;">ERP Purchase Order System</p>
+                                </div>
+                                <div>
+                                    <p class="text-muted" style="margin: 0 0 4px 0; font-size: 12px;">Version</p>
+                                    <p style="margin: 0; font-weight: 500;">1.0.0</p>
+                                </div>
+                                <div>
+                                    <p class="text-muted" style="margin: 0 0 4px 0; font-size: 12px;">API Endpoint</p>
+                                    <p style="margin: 0; font-weight: 500; font-family: 'JetBrains Mono', monospace; font-size: 12px;" id="apiEndpoint">localhost:8000</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Preferences -->
+                    <div class="glass-card">
+                        <div style="padding: 24px; border-bottom: 1px solid var(--border-color);">
+                            <h3 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 700;">
+                                <i class="fas fa-sliders-h" style="margin-right: 8px; color: var(--primary);"></i>
+                                Preferences
+                            </h3>
+                            <p class="text-muted" style="margin: 0; font-size: 13px;">Customize your experience</p>
+                        </div>
+                        <div style="padding: 24px;">
+                            <div style="display: grid; gap: 16px;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; margin-bottom: 0;">
+                                        <input type="checkbox" id="emailNotifications" checked style="width: 20px; height: 20px; cursor: pointer;">
+                                        <span>Email Notifications</span>
+                                    </label>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; margin-bottom: 0;">
+                                        <input type="checkbox" id="compactView" style="width: 20px; height: 20px; cursor: pointer;">
+                                        <span>Compact View</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Management -->
+                    <div class="glass-card">
+                        <div style="padding: 24px; border-bottom: 1px solid var(--border-color);">
+                            <h3 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 700;">
+                                <i class="fas fa-database" style="margin-right: 8px; color: var(--primary);"></i>
+                                Data
+                            </h3>
+                            <p class="text-muted" style="margin: 0; font-size: 13px;">Data management options</p>
+                        </div>
+                        <div style="padding: 24px;">
+                            <div style="display: grid; gap: 12px;">
+                                <button class="btn btn-secondary" onclick="clearCache()" style="width: 100%;">
+                                    <i class="fas fa-broom" style="margin-right: 8px;"></i>
+                                    Clear Cache
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!requireAuth()) return;
+            initApp('Settings');
+
+            // Load user info
+            const user = getUser();
+            if (user) {
+                document.getElementById('userEmail').textContent = user.email || '—';
+                document.getElementById('userFullName').textContent = user.full_name || '—';
+                document.getElementById('authProvider').textContent = (user.provider || 'google').toUpperCase();
+            }
+
+            // Set API endpoint
+            document.getElementById('apiEndpoint').textContent = window.location.origin;
+
+            // Dark mode toggle
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            darkModeToggle.checked = getTheme() === 'dark';
+            darkModeToggle.addEventListener('change', function() {
+                setTheme(this.checked ? 'dark' : 'light');
+            });
+
+            // Preferences
+            const emailNotifications = document.getElementById('emailNotifications');
+            const compactView = document.getElementById('compactView');
+
+            emailNotifications.checked = localStorage.getItem('emailNotifications') !== 'false';
+            compactView.checked = localStorage.getItem('compactView') === 'true';
+
+            emailNotifications.addEventListener('change', function() {
+                localStorage.setItem('emailNotifications', this.checked);
+                showToast('Email notifications ' + (this.checked ? 'enabled' : 'disabled'), 'success');
+            });
+
+            compactView.addEventListener('change', function() {
+                localStorage.setItem('compactView', this.checked);
+                showToast('View preference saved', 'success');
+            });
+        });
+
+        function clearCache() {
+            if (!confirm('Clear local cache? This will not delete any server data.')) return;
+
+            try {
+                // Don't clear auth tokens
+                const token = localStorage.getItem('erp_token');
+                const user = localStorage.getItem('erp_user');
+                const theme = localStorage.getItem('erp_theme');
+
+                localStorage.clear();
+
+                // Restore important data
+                if (token) localStorage.setItem('erp_token', token);
+                if (user) localStorage.setItem('erp_user', user);
+                if (theme) localStorage.setItem('erp_theme', theme);
+
+                showToast('Cache cleared successfully', 'success');
+            } catch (error) {
+                showToast('Error clearing cache: ' + error.message, 'error');
+            }
+        }
+    </script>
+
+    <style>
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .glass-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.1);
+        }
+    </style>
+</body>
+</html>
