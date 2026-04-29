@@ -1,0 +1,22 @@
+# Virtual Environment
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+
+# Environment variables
+.env
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Logs
+*.log
+
+# Database temp files
+*.db
+
+# Docker
+*.tar
