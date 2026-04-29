@@ -1,0 +1,22 @@
+<header class="navbar" id="navbar">
+    <div class="navbar-left">
+        <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <div>
+            <h2 class="page-title" id="pageTitle">Dashboard</h2>
+            <div class="page-subtitle" id="pageSubtitle">GroceryERP / Overview</div>
+        </div>
+    </div>
+    <div class="navbar-right">
+        <div class="navbar-search">
+            <i class="fas fa-magnifying-glass"></i>
+            <input type="text" class="nav-search-input" placeholder="Search products, vendors, POs">
+        </div>
+        <button class="nav-icon-btn" title="Help"><i class="fas fa-circle-question"></i></button>
+        <button class="nav-icon-btn" onclick="toggleTheme()" title="Toggle Dark Mode"><i class="fas fa-moon"
+                id="themeIcon"></i></button>
+        <button class="nav-icon-btn" title="Alerts" onclick="window.location.href='alerts.html'"><i
+                class="fas fa-bell"></i><span class="badge" id="alertBadge"></span></button>
+        <div class="user-avatar" id="userAvatar" title="Profile"><span id="userInitials">U</span></div>
+        <a class="btn btn-primary btn-sm" href="create_po.html"><i class="fas fa-plus"></i> New PO</a>
+    </div>
+</header>
